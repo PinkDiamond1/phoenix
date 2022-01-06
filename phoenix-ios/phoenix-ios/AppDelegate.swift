@@ -684,7 +684,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	///
 	@discardableResult
 	func loadWallet(
-		mnemonics: [String],
+		recoveryPhrase: RecoveryPhrase,
 		seed knownSeed: KotlinByteArray? = nil,
 		walletRestoreType: WalletRestoreType? = nil
 	) -> Bool {
@@ -696,8 +696,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			return false
 		}
 		
-		let seed = knownSeed ?? business.prepWallet(mnemonics: mnemonics, passphrase: "")
-		let cloudInfo = business.loadWallet(seed: seed)
+		guard let language = MnemonicLanguage.fromLanguageCode(recoveryPhrase.languageCode) else {
+			return false
+		}
+		
+		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(
+			mnemonics  : recoveryPhrase.mnemonicsArray,
+			wordList   : language.wordlist(),
+			passphrase : ""
+		)
+		let cloudInfo = business.walletManager.loadWallet(seed: seed)
 		walletLoaded = true
 		
 		maybeRegisterFcmToken()
@@ -741,7 +749,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			_encryptedNodeId = encryptedNodeId
 			_syncManager = SyncManager(
 				chain: business.chain,
-				mnemonics: mnemonics,
+				recoveryPhrase: recoveryPhrase,
 				cloudKey: cloudKey,
 				encryptedNodeId: encryptedNodeId
 			)

@@ -226,21 +226,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}.store(in: &cancellables)
 		
 		AppSecurity.shared.tryUnlockWithKeychain {
-			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, danger: LossOfSeedDanger?) in
+			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, danger: LossOfSeedDanger?) in
 
 			// There are multiple potential configurations:
 			//
-			// - no security       => mnemonics are available, enabledSecurity is empty
-			// - standard security => mnemonics are available, enabledSecurity is non-empty
-			// - advanced security => mnemonics are not available, enabledSecurity is non-empty
+			// - no security       => recoveryPhrase is available, enabledSecurity is empty
+			// - standard security => recoveryPhrase is available, enabledSecurity is non-empty
+			// - advanced security => recoveryPhrase is NOT available, enabledSecurity is non-empty
 			//
 			// Another way to think about it:
 			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
 			// - advanced security => biometrics required to unlock both the UI and the seed
 
-			if let mnemonics = mnemonics {
+			if let recoveryPhrase = recoveryPhrase {
 				// unlock & load wallet
-				AppDelegate.get().loadWallet(mnemonics: mnemonics)
+				AppDelegate.get().loadWallet(recoveryPhrase: recoveryPhrase)
 			}
 			
 			if let danger = danger {

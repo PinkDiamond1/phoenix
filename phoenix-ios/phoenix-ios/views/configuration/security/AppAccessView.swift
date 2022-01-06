@@ -372,13 +372,13 @@ struct AppAccessView : View {
 		// - SecurityFile.keychain == nil
 		// - SecurityFile.biometrics != nil
 		
-		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, _, _) in
+		AppSecurity.shared.tryUnlockWithKeychain {(recoveryPhrase, _, _) in
 			
-			guard let mnemnoics = mnemonics else {
+			guard let recoveryPhrase = recoveryPhrase else {
 				return completion(false)
 			}
 			
-			AppSecurity.shared.addBiometricsEntry(mnemonics: mnemnoics) {(error: Error?) in
+			AppSecurity.shared.addBiometricsEntry(recoveryPhrase: recoveryPhrase) {(error: Error?) in
 				completion(error == nil)
 			}
 		}
@@ -402,11 +402,11 @@ struct AppAccessView : View {
 		
 		AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
 			
-			guard case .success(let mnemonics) = result else {
+			guard case .success(let recoveryPhrase) = result else {
 				return completion(false)
 			}
 			
-			AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
+			AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 				completion(error == nil)
 			}
 		}

@@ -256,8 +256,20 @@ struct ErrorDetailsView: View, ViewName {
 					txt += "keyNotFound"
 				case .errorOpeningBox(let underlying):
 					txt += "errorOpeningBox:\n\(String(describing: underlying))"
-				case .invalidMnemonics:
-					txt += "invalidMnemonics"
+			}
+		} else {
+			txt += "none"
+		}
+		
+		txt += "\n\n"
+		
+		txt += "readRecoveryPhraseError: "
+		if let err = danger.readRecoveryPhraseError {
+			switch err {
+				case .invalidCiphertext:
+					txt += "invalidCiphertext"
+				case .invalidJSON:
+					txt += "invalidJSON"
 			}
 		} else {
 			txt += "none"

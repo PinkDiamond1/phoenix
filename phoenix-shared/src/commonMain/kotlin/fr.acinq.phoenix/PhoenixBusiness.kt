@@ -93,23 +93,6 @@ class PhoenixBusiness(
         }
     }
 
-    // Converts a mnemonics list to a seed.
-    // This is generally called with a mnemonics list that has been previously saved.
-    fun prepWallet(mnemonics: List<String>, passphrase: String = ""): ByteArray {
-        MnemonicCode.validate(mnemonics)
-        return MnemonicCode.toSeed(mnemonics, passphrase)
-    }
-
-    fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
-        if (walletManager.wallet.value == null) {
-            walletManager.loadWallet(seed)
-            return walletManager.wallet.value?.cloudKeyAndEncryptedNodeId()
-        }
-        return null
-    }
-
-    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub()
-
     fun peerState() = peerManager.peerState
 
     // The (node_id, fcm_token) tuple only needs to be registered once.

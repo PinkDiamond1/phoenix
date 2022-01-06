@@ -73,9 +73,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	///
 	private let chain: Chain
 	
-	/// The 12-word seed phrase for the wallet.
+	/// The 12-word recovery phrase (and associated language) for the wallet.
 	///
-	private let mnemonics: String
+	private let recoveryPhrase: RecoveryPhrase
 	
 	/// The encryptedNodeId is created via: Hash(cloudKey + nodeID)
 	///
@@ -103,11 +103,11 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], encryptedNodeId: String) {
+	init(chain: Chain, recoveryPhrase: RecoveryPhrase, encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
-		self.mnemonics = mnemonics.joined(separator: " ")
+		self.recoveryPhrase = recoveryPhrase
 		self.encryptedNodeId = encryptedNodeId
 		
 		record_table_name = SyncSeedManager.record_table_name(chain: chain)
@@ -587,8 +587,8 @@ class SyncSeedManager: SyncManagerProtcol {
 			recordID: recordID()
 		)
 		
-		record[record_column_mnemonics] = mnemonics
-		record[record_column_language] = "en"
+		record[record_column_mnemonics] = recoveryPhrase.mnemonics
+		record[record_column_language] = recoveryPhrase.languageCode
 		record[record_column_name] = uploadedName
 		
 		let operation = CKModifyRecordsOperation(

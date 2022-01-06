@@ -40,7 +40,7 @@ struct GenericPasswordStore {
 	) throws {
 		
 		guard let keyData = key.data(using: .utf8) else {
-			throw KeyStoreError("Unable to convert strong to data using utf8")
+			throw KeyStoreError("Unable to convert string to data using utf8")
 		}
 		
 		try storeKey(keyData, account: account, mixins: mixins)

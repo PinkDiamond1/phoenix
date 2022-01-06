@@ -182,12 +182,15 @@ struct RestoreView: View {
 	func didTapRow(_ seedBackup: SeedBackup) {
 		log.trace("didTapRow: \(seedBackup.name ?? "Wallet")")
 		
-		let mnemonics = seedBackup.mnemonics.components(separatedBy: " ")
+		let recoveryPhrase = RecoveryPhrase(
+			mnemonics    : seedBackup.mnemonics,
+			languageCode : seedBackup.language
+		)
 		
-		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
+		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				AppDelegate.get().loadWallet(
-					mnemonics: mnemonics,
+					recoveryPhrase: recoveryPhrase,
 					walletRestoreType: .fromCloudBackup(name: seedBackup.name)
 				)
 			}

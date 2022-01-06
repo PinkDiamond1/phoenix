@@ -816,3 +816,91 @@ extension BitcoinUnit {
 		return self.name
 	}
 }
+
+extension MnemonicLanguage {
+	
+	var flag: String { switch self {
+		case .english : return "🇬🇧"
+		case .spanish : return "🇪🇸"
+		case .french  : return "🇫🇷"
+		case .czech   : return "🇨🇿"
+		default       : return "🏳️"
+	}}
+	
+	var displayName: String {
+		
+		if let result = Locale.current.localizedString(forLanguageCode: self.code) {
+			return result
+		}
+		
+		switch self {
+			case .english : return "English"
+			case .spanish : return "Spanish"
+			case .french  : return "French"
+			case .czech   : return "Czech"
+			default       : return "Unknown"
+		}
+	}
+	
+	class func fromLanguageCode(_ code: String) -> MnemonicLanguage? {
+		
+		let all: KotlinArray<MnemonicLanguage> = MnemonicLanguage.values()
+		
+		let iterator = all.iterator()
+		while iterator.hasNext() {
+			if let lang = iterator.next() as? MnemonicLanguage {
+				if lang.code.caseInsensitiveCompare(code) == .orderedSame {
+					return lang
+				}
+			}
+		}
+		
+		return nil
+	}
+	
+	class var allCases: [MnemonicLanguage]  {
+		let all: KotlinArray<MnemonicLanguage> = MnemonicLanguage.values()
+		
+		var result = [MnemonicLanguage]()
+		result.reserveCapacity(Int(all.size))
+		
+		let iterator = all.iterator()
+		while iterator.hasNext() {
+			if let lang = iterator.next() as? MnemonicLanguage {
+				result.append(lang)
+			}
+		}
+		
+		return result
+	}
+	
+	class var defaultCase: MnemonicLanguage {
+		
+		let available = self.allCases
+		
+		// Locale.preferredLanguages returns an ordered list,
+		// according to the user's configured preferences within the OS.
+		//
+		// For example:
+		// - [0] Arabic
+		// - [1] Spanish
+		// - [2] Portuguese
+		//
+		// Thus, absent a MnemonicLanguage for Arabic, we would choose Spanish.
+		
+		for identifier in Locale.preferredLanguages {
+			
+			let locale = Locale(identifier: identifier)
+			if let code = locale.languageCode {
+				
+				for lang in available {
+					if lang.code.caseInsensitiveCompare(code) == .orderedSame {
+						return lang
+					}
+				}
+			}
+		}
+		
+		return .english
+	}
+}

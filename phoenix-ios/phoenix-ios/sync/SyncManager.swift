@@ -27,11 +27,11 @@ class SyncManager {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], cloudKey: Bitcoin_kmpByteVector32, encryptedNodeId: String) {
+	init(chain: Chain, recoveryPhrase: RecoveryPhrase, cloudKey: Bitcoin_kmpByteVector32, encryptedNodeId: String) {
 		
 		syncSeedManager = SyncSeedManager(
 			chain: chain,
-			mnemonics: mnemonics,
+			recoveryPhrase: recoveryPhrase,
 			encryptedNodeId: encryptedNodeId
 		)
 		syncTxManager = SyncTxManager(

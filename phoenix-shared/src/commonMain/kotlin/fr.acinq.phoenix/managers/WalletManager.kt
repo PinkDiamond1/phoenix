@@ -1,6 +1,8 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.Wallet
 import kotlinx.coroutines.CoroutineScope
@@ -30,8 +32,26 @@ class WalletManager(
         }
     }
 
-    fun loadWallet(seed: ByteArray) {
+    // Converts a mnemonics list to a seed.
+    // This is generally called with a mnemonics list that has been previously saved.
+    fun mnemonicsToSeed(
+        mnemonics: List<String>,
+        wordList: List<String>,
+        passphrase: String = ""
+    ): ByteArray {
+        MnemonicCode.validate(mnemonics = mnemonics, wordlist = wordList)
+        return MnemonicCode.toSeed(mnemonics, passphrase)
+    }
+
+    fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
+        if (_wallet.value != null) {
+            return null
+        }
+
         val newWallet = Wallet(seed, chain)
         _wallet.value = newWallet
+        return newWallet.cloudKeyAndEncryptedNodeId()
     }
+
+    fun getXpub(): Pair<String, String>? = _wallet.value?.xpub()
 }
