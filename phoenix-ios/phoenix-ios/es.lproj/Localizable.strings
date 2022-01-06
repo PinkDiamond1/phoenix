@@ -1260,5 +1260,5 @@
 "Your wallet is empty. The first payment you receive must be at least **%@**." = "Tu billetera está vacía. El primer pago que reciba debe ser de al menos **% @ **.";
 
 /* No comment provided by engineer. */
-"Your wallet's seed is a list of 12 English words." = "La semilla de su billetera es una lista de 12 palabras en inglés.";
+"Your wallet's seed is a list of 12 words." = "La semilla de su billetera es una lista de 12 palabras.";
 

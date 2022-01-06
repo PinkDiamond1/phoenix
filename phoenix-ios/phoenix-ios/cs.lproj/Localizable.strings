@@ -1061,4 +1061,4 @@
 "Your wallet is empty. The first payment you receive must be at least **%@**." = "Vaše peněženka je prázdná. První platba kterou dostanete musí být nejméně **% @ **.";
 
 /* No comment provided by engineer. */
-"Your wallet's seed is a list of 12 English words." = "Seed vaší peněženky je seznam 12 anglických slov.";
+"Your wallet's seed is a list of 12 words." = "Seed vaší peněženky je seznam 12 slov.";
