@@ -26,6 +26,8 @@ struct InitializationView: MVIView {
 	)
 	@State var buttonWidth: CGFloat? = nil
 	
+	@State var mnemonicLanguage = MnemonicLanguage.english
+	
 	@ViewBuilder
 	var view: some View {
 		
@@ -89,6 +91,12 @@ struct InitializationView: MVIView {
 						disabledBorderStroke: Color(UIColor.separator)
 					)
 				)
+				.padding(.bottom, 8)
+				
+				NavigationLink(destination: InitializationOptionsView(mnemonicLanguage: $mnemonicLanguage)) {
+					Text("advanced options")
+						.font(.subheadline)
+				}
 				.padding(.bottom, 40)
 
 				NavigationLink(destination: RestoreView()) {
@@ -144,7 +152,7 @@ struct InitializationView: MVIView {
 		
 		mvi.intent(Initialization.IntentGenerateWallet(
 			entropy: kotlinEntropy,
-			language: MnemonicLanguage.defaultCase
+			language: mnemonicLanguage
 		))
 	}
 	
@@ -171,6 +179,92 @@ struct InitializationView: MVIView {
 		}
 	}
 }
+
+struct InitializationOptionsView: View {
+	
+	@Binding var mnemonicLanguage: MnemonicLanguage
+	
+	@ViewBuilder
+	var body: some View {
+		
+		ZStack {
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if AppDelegate.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+			}
+			
+			content
+		}
+		.navigationBarTitle(
+			NSLocalizedString("Advanced Options", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		List {
+			Section(header: Text("BIP39 Mnemonic")) {
+				ForEach(MnemonicLanguage.allCases, id: \.code) { lang in
+					Toggle(isOn: Binding(
+						get: { mnemonicLanguage == lang },
+						set: { if $0 { mnemonicLanguage = lang }}
+					)) {
+						Text(verbatim: "\(lang.flag) \(lang.displayName)")
+					}
+					.toggleStyle(CheckboxToggleStyle(
+						onImage: onImage(),
+						offImage: offImage()
+					))
+					.padding(.vertical, 5)
+					
+				} // </ForEach>
+			} // </Section>
+			
+			Section(header: Text("Notes")) {
+				Text(styled: NSLocalizedString(
+					"""
+					Your recovery phrase is 12 words, generated using the BIP39 standard.
+					
+					In extreme circumstances (for example, if Phoenix is removed from the App Store) \
+					you may need to recover your funds using a different wallet. In this case, English \
+					offers the highest compatibility with other wallets.
+					
+					Unfortunately, many other wallets neglect non-English speaking users. 🥺
+					
+					However, if you prefer another language, we provide detailed recovery instructions \
+					for non-English mnemonics on our website.
+					
+					Your selection here does **not** affect your ability to send or receive bitcoin \
+					within Phoenix.
+					""",
+					comment: "Intialization: Advanced options"
+				))
+				.font(.callout)
+				.padding(.vertical, 5)
+			} // </Section>
+		} // </List>
+	}
+	
+	@ViewBuilder
+	func onImage() -> some View {
+		Image(systemName: "checkmark.square.fill")
+			.imageScale(.large)
+	}
+	
+	@ViewBuilder
+	func offImage() -> some View {
+		Image(systemName: "square")
+			.imageScale(.large)
+	}
+}
+
+// MARK: -
 
 class InitView_Previews : PreviewProvider {
 
