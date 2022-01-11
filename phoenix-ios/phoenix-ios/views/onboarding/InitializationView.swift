@@ -215,7 +215,14 @@ struct InitializationOptionsView: View {
 						get: { mnemonicLanguage == lang },
 						set: { if $0 { mnemonicLanguage = lang }}
 					)) {
-						Text(verbatim: "\(lang.flag) \(lang.displayName)")
+						HStack(alignment: VerticalAlignment.centerTopLine, spacing: 6) {
+							Text(verbatim: "\(lang.flag) \(lang.displayName)")
+							if lang == MnemonicLanguage.english {
+								Text("(recommended)")
+									.font(Font.subheadline)
+									.foregroundColor(Color.secondary)
+							}
+						}
 					}
 					.toggleStyle(CheckboxToggleStyle(
 						onImage: onImage(),
@@ -230,16 +237,10 @@ struct InitializationOptionsView: View {
 				Text(styled: NSLocalizedString(
 					"""
 					Your recovery phrase is 12 words, generated using the BIP39 standard.
-					
-					In extreme circumstances (for example, if Phoenix is removed from the App Store) \
-					you may need to recover your funds using a different wallet. In this case, English \
-					offers the highest compatibility with other wallets.
-					
-					Unfortunately, many other wallets neglect non-English speaking users. 🥺
-					
-					However, if you prefer another language, we provide detailed recovery instructions \
-					for non-English mnemonics on our website.
-					
+
+					English is recommended. If you prefer another language, we provide \
+					recovery instructions on our website.
+
 					Your selection here does **not** affect your ability to send or receive bitcoin \
 					within Phoenix.
 					""",
