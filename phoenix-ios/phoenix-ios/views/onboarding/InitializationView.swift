@@ -94,8 +94,11 @@ struct InitializationView: MVIView {
 				.padding(.bottom, 8)
 				
 				NavigationLink(destination: InitializationOptionsView(mnemonicLanguage: $mnemonicLanguage)) {
-					Text("advanced options")
-						.font(.subheadline)
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Text("wallet creation options")
+						Image(systemName: "gearshape")
+					}
+					.font(.subheadline)
 				}
 				.padding(.bottom, 40)
 
