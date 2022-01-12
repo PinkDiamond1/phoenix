@@ -15,22 +15,32 @@ data class Wallet(val seed: ByteVector64, val chain: Chain) {
 
     private val master by lazy { DeterministicWallet.generate(seed) }
 
-    fun masterPublicKey(path: String): String {
-        val publicKey =
-            DeterministicWallet.publicKey(
-                DeterministicWallet.derivePrivateKey(master, path)
-            )
-        return DeterministicWallet.encode(
-            input = publicKey,
-            prefix = if (chain.isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
+    /** Get the wallet (xpub, keyPath) */
+    fun xpub(): Pair<String, KeyPath> {
+        val isMainnet = chain.isMainnet()
+        val path = if (isMainnet) "m/84'/0'/0'" else "m/84'/1'/0'"
+        val keyPath = KeyPath.fromPath(path)
+        val publicKey = DeterministicWallet.publicKey(
+            DeterministicWallet.derivePrivateKey(master, keyPath)
         )
+        val xpub = DeterministicWallet.encode(
+            input = publicKey,
+            prefix = if (isMainnet) DeterministicWallet.zpub else DeterministicWallet.vpub
+        )
+        return xpub to keyPath
     }
 
-    /** Get the wallet (xpub, path) */
-    fun xpub(): Pair<String, String> {
+    /* Get the wallet (xprv, keyPath) */
+    fun xprv(): Pair<String, KeyPath> {
         val isMainnet = chain.isMainnet()
-        val masterPubkeyPath = if (isMainnet) "m/84'/0'/0'" else "m/84'/1'/0'"
-        return masterPublicKey(masterPubkeyPath) to masterPubkeyPath
+        val path = if (isMainnet) "m/84'/0'/0'" else "m/84'/1'/0'"
+        val keyPath = KeyPath.fromPath(path)
+        val privateKey = DeterministicWallet.derivePrivateKey(master, keyPath)
+        val xprv = DeterministicWallet.encode(
+            input = privateKey,
+            prefix = if (isMainnet) DeterministicWallet.zprv else DeterministicWallet.vprv
+        )
+        return xprv to keyPath
     }
 
     fun onchainAddress(path: String): String {

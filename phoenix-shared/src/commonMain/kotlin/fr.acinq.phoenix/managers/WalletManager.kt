@@ -2,6 +2,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.Wallet
@@ -53,5 +54,6 @@ class WalletManager(
         return newWallet.cloudKeyAndEncryptedNodeId()
     }
 
-    fun getXpub(): Pair<String, String>? = _wallet.value?.xpub()
+    fun getXpub(): Pair<String, KeyPath>? = _wallet.value?.xpub()
+    fun getXprv(): Pair<String, KeyPath>? = _wallet.value?.xprv()
 }

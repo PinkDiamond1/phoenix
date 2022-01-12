@@ -65,6 +65,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 	
+	public var clearPasteboardOnReturnToApp: Bool = false
+	
 	// The taskID must match the value in Info.plist
 	private let taskId_watchTower = "co.acinq.phoenix.WatchTower"
 
@@ -172,6 +174,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		UIApplication.shared.applicationIconBadgeNumber = 0
 		self.badgeCount = 0
+		
+		if clearPasteboardOnReturnToApp {
+			if UIPasteboard.general.hasStrings {
+				UIPasteboard.general.string = ""
+			}
+			clearPasteboardOnReturnToApp = false
+		}
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {
@@ -696,7 +705,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			return false
 		}
 		
-		guard let language = MnemonicLanguage.fromLanguageCode(recoveryPhrase.languageCode) else {
+		guard let language = recoveryPhrase.language else {
 			return false
 		}
 		

@@ -86,8 +86,8 @@ struct ManualRestoreView: MVIView {
 		log.trace("finishAndRestoreWallet()")
 		
 		let recoveryPhrase = RecoveryPhrase(
-			mnemonics    : model.mnemonics,
-			languageCode : model.language.code
+			mnemonics : model.mnemonics,
+			language  : model.language
 		)
 		
 		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in

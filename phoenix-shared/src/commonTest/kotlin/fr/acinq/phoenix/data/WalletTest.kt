@@ -31,11 +31,19 @@ class WalletTest {
     private val testnetWallet = Wallet(seed, Chain.Testnet)
 
     @Test
-    fun masterPublicKey() {
+    fun xpub() {
         // Mainnet
-        assertEquals(mainnetWallet.masterPublicKey("m/84'/0'/0'"), "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs")
+        assertEquals(mainnetWallet.xpub().first, "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs")
         // Testnet
-        assertEquals(testnetWallet.masterPublicKey("m/84'/1'/0'"), "vpub5Y6cjg78GGuNLsaPhmYsiw4gYX3HoQiRBiSwDaBXKUafCt9bNwWQiitDk5VZ5BVxYnQdwoTyXSs2JHRPAgjAvtbBrf8ZhDYe2jWAqvZVnsc")
+        assertEquals(testnetWallet.xpub().first, "vpub5Y6cjg78GGuNLsaPhmYsiw4gYX3HoQiRBiSwDaBXKUafCt9bNwWQiitDk5VZ5BVxYnQdwoTyXSs2JHRPAgjAvtbBrf8ZhDYe2jWAqvZVnsc")
+    }
+
+    @Test
+    fun xprv() {
+        // Mainnet
+        assertEquals(mainnetWallet.xprv().first, "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE")
+        // Testnet
+        assertEquals(testnetWallet.xprv().first, "vprv9K7GLAaERuM58PVvbk1sMo7wzVCoPwzZpVXLRBmum93gL5pSqQCAAvZjtmz93nnnYMr9i2FwG2fqrwYLRgJmDDwFjGiamGsbRMJ5Y6siJ8H")
     }
 
     @Test

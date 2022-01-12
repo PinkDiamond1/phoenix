@@ -10,6 +10,10 @@ struct RecoveryPhrase: Codable {
 		return mnemonics.split(separator: " ").map { String($0) }
 	}
 	
+	var language: MnemonicLanguage? {
+		return MnemonicLanguage.fromLanguageCode(languageCode)
+	}
+	
 	private init(mnemonicsArray: [String], mnemonicsString: String, languageCode: String) {
 		
 		precondition(mnemonicsArray.count == 12, "Invalid parameter: mnemonics.count")
@@ -32,9 +36,19 @@ struct RecoveryPhrase: Codable {
 		self.init(mnemonicsArray: mnemonicsArray, mnemonicsString: mnemonicsString, languageCode: languageCode)
 	}
 	
+	init(mnemonics mnemonicsArray: [String], language: MnemonicLanguage) {
+		
+		self.init(mnemonics: mnemonicsArray, languageCode: language.code)
+	}
+	
 	init(mnemonics mnemonicsString: String, languageCode: String) {
 		
 		let mnemonicsArray = mnemonicsString.split(separator: " ").map { String($0) }
 		self.init(mnemonicsArray: mnemonicsArray, mnemonicsString: mnemonicsString, languageCode: languageCode)
+	}
+	
+	init(mnemonics mnemonicsString: String, language: MnemonicLanguage) {
+		
+		self.init(mnemonics: mnemonicsString, languageCode: language.code)
 	}
 }

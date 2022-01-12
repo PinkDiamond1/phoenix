@@ -127,35 +127,6 @@ struct ElectrumConfigurationView: MVIView {
 						Text(verbatim: "-")
 					}
 				}
-
-			/*	Why is this removed ?
-
-				if let xpub = mvi.model.xpub {
-					ListItem(header: Text("Master public key")) {
-						Text(xpub)
-							.contextMenu {
-								Button(action: {
-									UIPasteboard.general.string = xpub
-								}) {
-									Text("Copy")
-								}
-							}
-					}
-				}
-				
-				if let path = mvi.model.path {
-					ListItem(header: Text("Path")) {
-						Text(path)
-							.contextMenu {
-								Button(action: {
-									UIPasteboard.general.string = path
-								}) {
-									Text("Copy")
-								}
-							}
-					}
-				}
-			*/
 				
 			} // </Section: Status>
 			

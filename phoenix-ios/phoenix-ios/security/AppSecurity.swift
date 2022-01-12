@@ -226,7 +226,7 @@ class AppSecurity {
 			
 			result = RecoveryPhrase(
 				mnemonics: cleartextString,
-				languageCode: MnemonicLanguage.english.code
+				language: MnemonicLanguage.english
 			)
 		}
 		
