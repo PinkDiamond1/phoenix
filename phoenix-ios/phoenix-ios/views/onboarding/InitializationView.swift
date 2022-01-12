@@ -11,6 +11,10 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case InitializationOptionsView
+	case RestoreView
+}
 
 struct InitializationView: MVIView {
 	
@@ -19,6 +23,8 @@ struct InitializationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
+	@State private var navLinkTag: NavLinkTag? = nil
+	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
 		key: AppendValue<ButtonWidth>.self,
@@ -26,12 +32,24 @@ struct InitializationView: MVIView {
 	)
 	@State var buttonWidth: CGFloat? = nil
 	
+	let advancedOptionsEnabled = true
+	let advancedOptionsHidden = true
 	@State var mnemonicLanguage = MnemonicLanguage.english
 	
 	@ViewBuilder
 	var view: some View {
 		
 		ZStack {
+			
+			NavigationLink(
+				destination: navLinkView(),
+				isActive: Binding(
+					get: { navLinkTag != nil },
+					set: { if !$0 { navLinkTag = nil }}
+				)
+			) {
+				EmptyView()
+			}
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
@@ -56,87 +74,123 @@ struct InitializationView: MVIView {
 				.padding(.all, 20)
 			}
 			
-			// Primary content
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			content
 			
-				Spacer()
-				
-				Image(logoImageName)
-					.resizable()
-					.frame(width: 96, height: 96)
+		} // </ZStack>
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.navigationBarTitle("", displayMode: .inline)
+		.navigationBarHidden(true)
+		.onChange(of: mvi.model, perform: { model in
+			onModelChange(model: model)
+		})
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		
+			Spacer()
+			
+			Image(logoImageName)
+				.resizable()
+				.frame(width: 96, height: 96)
 
-				Text("Phoenix")
-					.font(Font.title2)
-					.padding(.top, -10)
-					.padding(.bottom, 80)
-				
-				Button {
-					createMnemonics()
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline) {
-						Image(systemName: "flame")
-							.imageScale(.small)
-						Text("Create new wallet")
-					}
-					.read(buttonWidthReader)
-					.frame(width: buttonWidth)
-					.font(.title3)
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
+			Text("Phoenix")
+				.font(Font.title2)
+				.padding(.top, -10)
+				.padding(.bottom, 80)
+			
+			Button {
+				log.debug("Button(create).action()")
+				createMnemonics()
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline) {
+					Image(systemName: "flame")
+						.imageScale(.small)
+					Text("Create new wallet")
 				}
-				.buttonStyle(
-					ScaleButtonStyle(
-						backgroundFill: Color.primaryBackground,
-						borderStroke: Color.appAccent,
-						disabledBorderStroke: Color(UIColor.separator)
-					)
+				.read(buttonWidthReader)
+				.frame(width: buttonWidth)
+				.font(.title3)
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+			}
+			.simultaneousGesture(LongPressGesture().onEnded { _ in
+				if advancedOptionsEnabled && advancedOptionsHidden {
+					log.debug("Button(create).longPressGesture()")
+					navLinkTag = .InitializationOptionsView
+				}
+			})
+			.simultaneousGesture(TapGesture().onEnded {
+				log.debug("Button(create).tapGesture()")
+				createMnemonics()
+			})
+			.buttonStyle(
+				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
+					borderStroke: Color.appAccent,
+					disabledBorderStroke: Color(UIColor.separator)
 				)
-				.padding(.bottom, 8)
-				
-				NavigationLink(destination: InitializationOptionsView(mnemonicLanguage: $mnemonicLanguage)) {
+			)
+			
+			if advancedOptionsEnabled && !advancedOptionsHidden {
+				Button {
+					navLinkTag = .InitializationOptionsView
+				} label: {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
 						Text("wallet creation options")
 						Image(systemName: "gearshape")
 					}
 					.font(.subheadline)
 				}
-				.padding(.bottom, 40)
-
-				NavigationLink(destination: RestoreView()) {
-					HStack(alignment: VerticalAlignment.firstTextBaseline) {
-						Image(systemName: "arrow.down.circle")
-							.imageScale(.small)
-						Text("Restore my wallet")
-					}
-					.read(buttonWidthReader)
-					.frame(width: buttonWidth)
-					.font(.title3)
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-				}
-				.buttonStyle(
-					ScaleButtonStyle(
-						backgroundFill: Color.primaryBackground,
-						borderStroke: Color.appAccent,
-						disabledBorderStroke: Color(UIColor.separator)
-					)
-				)
-				.padding([.top, .bottom], 0)
-				
-				Spacer() // 2 spacers at bottom
-				Spacer() // move center upwards; focus is buttons, not logo
-
-			} // </VStack>
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(.top, 8)
+			}
 			
-		} // </ZStack>
+			Spacer().frame(maxHeight: 40)
+
+			Button {
+				navLinkTag = .RestoreView
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline) {
+					Image(systemName: "arrow.down.circle")
+						.imageScale(.small)
+					Text("Restore my wallet")
+				}
+				.read(buttonWidthReader)
+				.frame(width: buttonWidth)
+				.font(.title3)
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
+					borderStroke: Color.appAccent,
+					disabledBorderStroke: Color(UIColor.separator)
+				)
+			)
+			.padding([.top, .bottom], 0)
+			
+			Spacer() // 2 spacers at bottom
+			Spacer() // move center upwards; focus is buttons, not logo
+
+		} // </VStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
-		.navigationBarTitle("", displayMode: .inline)
-		.navigationBarHidden(true)
-		.onChange(of: mvi.model, perform: { model in
-			onModelChange(model: model)
-		})
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		switch navLinkTag {
+		case .InitializationOptionsView:
+			InitializationOptionsView(mnemonicLanguage: $mnemonicLanguage)
+		case .RestoreView:
+			RestoreView()
+		default:
+			EmptyView()
+		}
 	}
 	
 	var logoImageName: String {
